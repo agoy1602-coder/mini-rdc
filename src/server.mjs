@@ -53,7 +53,7 @@ async function request(req, res) {
   const url = new URL(req.url, `http://${HOST}:${PORT}`);
   if (url.pathname === '/mcp') return mcpNodeHandler(req, res);
   if (req.method === 'GET' && url.pathname === '/api/health') {
-    return json(res, 200, { ok: true, name: 'mini-rdc', version: '0.3.0' });
+    return json(res, 200, { ok: true, name: 'mini-rdc', version: '0.4.0' });
   }
   if (req.method === 'GET' && url.pathname === '/api/system') {
     const rg = await run('rg', ['--version']);
