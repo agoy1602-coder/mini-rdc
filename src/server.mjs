@@ -12,7 +12,14 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WEB = path.join(ROOT, 'web');
 const PORT = Number(process.env.MINI_RDC_PORT || 8787);
 const HOST = process.env.MINI_RDC_HOST || '127.0.0.1';
+const TOKEN = process.env.MINI_RDC_TOKEN || '';
+const REQUEST_TIMEOUT_MS = 30_000;
 const mcpNodeHandler = toNodeHandler(mcpHandler);
+
+function authorized(req) {
+  if (!TOKEN) return true;
+  return req.headers.authorization === `Bearer ${TOKEN}`;
+}
 
 function json(res, status, data) {
   const body = JSON.stringify(data);
@@ -39,6 +46,10 @@ async function body(req) {
 }
 
 async function request(req, res) {
+  if (!authorized(req)) {
+    res.setHeader('www-authenticate', 'Bearer');
+    return json(res, 401, { error: 'Authentication required' });
+  }
   const url = new URL(req.url, `http://${HOST}:${PORT}`);
   if (url.pathname === '/mcp') return mcpNodeHandler(req, res);
   if (req.method === 'GET' && url.pathname === '/api/health') {
@@ -76,7 +87,11 @@ async function request(req, res) {
 }
 
 const server = http.createServer((req, res) => {
+  req.setTimeout(REQUEST_TIMEOUT_MS, () => res.destroy());
+  res.setHeader('x-content-type-options', 'nosniff');
   request(req, res).catch(error => json(res, 400, { error: error.message }));
 });
 
+server.requestTimeout = REQUEST_TIMEOUT_MS;
+server.headersTimeout = REQUEST_TIMEOUT_MS;
 server.listen(PORT, HOST, () => console.log(`Mini-RDC listening at http://${HOST}:${PORT}`));
