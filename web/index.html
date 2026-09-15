@@ -43,6 +43,13 @@
     <div id="crumb" class="muted"></div><ul id="files"><li>Loading…</li></ul>
   </section>
   <section class="card">
+    <h2>Git</h2>
+    <div class="row"><input id="gitPath" value="." aria-label="Git repository path"><button id="gitRefresh">Inspect</button></div>
+    <pre id="gitStatus" class="muted">No repository inspected.</pre>
+    <details><summary>Recent commits</summary><pre id="gitLog"></pre></details>
+    <details><summary>Working-tree diff</summary><pre id="gitDiff"></pre></details>
+  </section>
+  <section class="card">
     <h2>Search with ripgrep</h2>
     <div class="row"><input id="pattern" placeholder="Search pattern"><input id="searchPath" value="." aria-label="Search path"><button id="search">Search</button></div>
     <pre id="results" class="muted">No search yet.</pre>

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { rgSearch } from './rg.mjs';
 import { listDirectory, readTextFile, safePath } from './fs.mjs';
+import { gitStatus, gitLog, gitDiff } from './git.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WEB = path.join(ROOT, 'web');
@@ -34,6 +35,10 @@ async function body(req) {
   if (text.length > 65536) throw new Error('Request body too large');
   return JSON.parse(text);
 }
+
+function repoPath(input = '.') {
+  return safePath(input);
+}
 async function request(req, res) {
   const url = new URL(req.url, `http://${HOST}:${PORT}`);
   if (req.method === 'GET' && url.pathname === '/api/health') {
@@ -44,15 +49,29 @@ async function request(req, res) {
     return json(res, 200, { node: process.version, rg: rg.stdout.split('\n')[0], platform: process.platform, arch: process.arch });
   }
   if (req.method === 'GET' && url.pathname === '/api/fs/list') {
-    return json(res, 200, { path: url.searchParams.get('path') || '.', entries: await listDirectory(url.searchParams.get('path') || '.') });
+    const input = url.searchParams.get('path') || '.';
+    return json(res, 200, { path: input, entries: await listDirectory(input) });
   }
   if (req.method === 'GET' && url.pathname === '/api/fs/read') {
-    return json(res, 200, { path: url.searchParams.get('path'), content: await readTextFile(url.searchParams.get('path')) });
+    const input = url.searchParams.get('path');
+    return json(res, 200, { path: input, content: await readTextFile(input) });
   }
   if (req.method === 'POST' && url.pathname === '/api/search') {
     const input = await body(req);
     const target = safePath(input.path || '.');
     return json(res, 200, await rgSearch({ ...input, path: target }));
+  }
+  if (req.method === 'GET' && url.pathname === '/api/git/status') {
+    const input = url.searchParams.get('path') || '.';
+    return json(res, 200, await gitStatus(repoPath(input)));
+  }
+  if (req.method === 'GET' && url.pathname === '/api/git/log') {
+    const input = url.searchParams.get('path') || '.';
+    return json(res, 200, await gitLog(repoPath(input), url.searchParams.get('limit')));
+  }
+  if (req.method === 'GET' && url.pathname === '/api/git/diff') {
+    const input = url.searchParams.get('path') || '.';
+    return json(res, 200, await gitDiff(repoPath(input)));
   }
   if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
     const html = await readFile(path.join(WEB, 'index.html'));
