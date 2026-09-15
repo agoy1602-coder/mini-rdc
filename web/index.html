@@ -7,21 +7,51 @@
   <style>
     :root { color-scheme: dark; font-family: system-ui,sans-serif; }
     body { margin:0; background:#101216; color:#eef1f5; }
-    main { max-width:900px; margin:auto; padding:24px; }
+    main { max-width:1100px; margin:auto; padding:20px; }
     header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .card { margin-top:18px; padding:18px; border:1px solid #30343b; border-radius:14px; background:#171a20; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .card { margin-top:16px; padding:16px; border:1px solid #30343b; border-radius:14px; background:#171a20; }
     .status { display:inline-flex; gap:8px; align-items:center; }
     .dot { width:10px; height:10px; border-radius:50%; background:#777; }
     .ok { background:#35d07f; }
-    button { border:0; border-radius:9px; padding:10px 14px; cursor:pointer; }
-    pre { white-space:pre-wrap; overflow:auto; }
+    button { border:0; border-radius:9px; padding:9px 12px; cursor:pointer; }
+    input, select { box-sizing:border-box; width:100%; padding:10px; border:1px solid #363b44; border-radius:9px; background:#0f1115; color:inherit; }
+    .row { display:flex; gap:8px; margin-bottom:10px; }
+    .row input { flex:1; }
+    .row button { flex:0 0 auto; }
+    ul { list-style:none; padding:0; margin:10px 0 0; max-height:360px; overflow:auto; }
+    li { display:flex; justify-content:space-between; gap:8px; padding:8px; border-bottom:1px solid #292d34; }
+    li button { background:transparent; color:#b9c8ff; padding:4px; }
+    pre { white-space:pre-wrap; overflow:auto; max-height:420px; }
+    .muted { color:#9aa1ac; }
+    @media (max-width:760px) { .grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
 <main>
-  <header><h1>Mini-RDC</h1><span class="status"><i id="dot" class="dot"></i><span id="status">Connecting…</span></span></header>
-  <section class="card"><h2>Termux</h2><pre id="system">Loading…</pre></section>
-  <section class="card"><h2>Mission</h2><p>Personal browser + MCP bridge for Termux.</p><button id="refresh">Refresh</button></section>
+  <header>
+    <h1>Mini-RDC</h1>
+    <span class="status"><i id="dot" class="dot"></i><span id="status">Connecting…</span></span>
+  </header>
+  <div class="grid">
+    <section class="card"><h2>Termux</h2><pre id="system">Loading…</pre></section>
+    <section class="card"><h2>Mission</h2><p class="muted">Personal browser + MCP bridge for Termux.</p><button id="refresh">Refresh</button></section>
+  </div>
+  <section class="card">
+    <h2>File Browser</h2>
+    <div class="row"><input id="path" value="." aria-label="Path"><button id="go">Open</button></div>
+    <div id="crumb" class="muted"></div><ul id="files"><li>Loading…</li></ul>
+  </section>
+  <section class="card">
+    <h2>Search with ripgrep</h2>
+    <div class="row"><input id="pattern" placeholder="Search pattern"><input id="searchPath" value="." aria-label="Search path"><button id="search">Search</button></div>
+    <pre id="results" class="muted">No search yet.</pre>
+  </section>
+  <section class="card">
+    <h2>File Viewer</h2>
+    <div id="viewerPath" class="muted">Select a file above.</div>
+    <pre id="viewer"></pre>
+  </section>
 </main>
 <script type="module" src="/app.js"></script>
 </body>
