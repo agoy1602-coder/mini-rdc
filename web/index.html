@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mini-RDC</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui,sans-serif; }
+    body { margin:0; background:#101216; color:#eef1f5; }
+    main { max-width:900px; margin:auto; padding:24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .card { margin-top:18px; padding:18px; border:1px solid #30343b; border-radius:14px; background:#171a20; }
+    .status { display:inline-flex; gap:8px; align-items:center; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#777; }
+    .ok { background:#35d07f; }
+    button { border:0; border-radius:9px; padding:10px 14px; cursor:pointer; }
+    pre { white-space:pre-wrap; overflow:auto; }
+  </style>
+</head>
+<body>
+<main>
+  <header><h1>Mini-RDC</h1><span class="status"><i id="dot" class="dot"></i><span id="status">Connecting…</span></span></header>
+  <section class="card"><h2>Termux</h2><pre id="system">Loading…</pre></section>
+  <section class="card"><h2>Mission</h2><p>Personal browser + MCP bridge for Termux.</p><button id="refresh">Refresh</button></section>
+</main>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

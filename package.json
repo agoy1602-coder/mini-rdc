@@ -1,0 +1,14 @@
+{
+  "name": "mini-rdc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal Mini Remote Desktop Commander for Termux",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
