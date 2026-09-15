@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { safePath } from './fs.mjs';
 
 function runGit(args) {
   return new Promise((resolve, reject) => {
@@ -11,21 +12,23 @@ function runGit(args) {
   });
 }
 
+function repoPath(input) { return safePath(input); }
+
 export async function gitStatus(input = '.') {
-  const result = await runGit(['-C', input, 'status', '--short', '--branch']);
+  const result = await runGit(['-C', repoPath(input), 'status', '--short', '--branch']);
   if (result.code !== 0) throw new Error(result.stderr.trim() || 'git status failed');
   return { path: input, output: result.stdout };
 }
 
 export async function gitLog(input = '.', limit = 20) {
   const count = Math.min(Math.max(Number(limit) || 20, 1), 50);
-  const result = await runGit(['-C', input, 'log', `-${count}`, '--oneline', '--decorate']);
+  const result = await runGit(['-C', repoPath(input), 'log', `-${count}`, '--oneline', '--decorate']);
   if (result.code !== 0) throw new Error(result.stderr.trim() || 'git log failed');
   return { path: input, output: result.stdout };
 }
 
 export async function gitDiff(input = '.') {
-  const result = await runGit(['-C', input, 'diff', '--stat', '--']);
+  const result = await runGit(['-C', repoPath(input), 'diff', '--stat', '--']);
   if (result.code !== 0) throw new Error(result.stderr.trim() || 'git diff failed');
   return { path: input, output: result.stdout };
 }

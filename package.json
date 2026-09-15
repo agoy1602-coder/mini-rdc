@@ -1,6 +1,6 @@
 {
   "name": "mini-rdc",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Personal Mini Remote Desktop Commander for Termux",
   "type": "module",
@@ -10,5 +10,11 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@modelcontextprotocol/node": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "zod": "^4.6.5"
   }
 }

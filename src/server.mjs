@@ -3,14 +3,16 @@ import { readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { toNodeHandler } from '@modelcontextprotocol/node';
+import { mcpHandler } from './mcp.mjs';
 import { rgSearch } from './rg.mjs';
 import { listDirectory, readTextFile, safePath } from './fs.mjs';
-import { gitStatus, gitLog, gitDiff } from './git.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WEB = path.join(ROOT, 'web');
 const PORT = Number(process.env.MINI_RDC_PORT || 8787);
 const HOST = process.env.MINI_RDC_HOST || '127.0.0.1';
+const mcpNodeHandler = toNodeHandler(mcpHandler);
 
 function json(res, status, data) {
   const body = JSON.stringify(data);
@@ -36,13 +38,11 @@ async function body(req) {
   return JSON.parse(text);
 }
 
-function repoPath(input = '.') {
-  return safePath(input);
-}
 async function request(req, res) {
   const url = new URL(req.url, `http://${HOST}:${PORT}`);
+  if (url.pathname === '/mcp') return mcpNodeHandler(req, res);
   if (req.method === 'GET' && url.pathname === '/api/health') {
-    return json(res, 200, { ok: true, name: 'mini-rdc', version: '0.2.0' });
+    return json(res, 200, { ok: true, name: 'mini-rdc', version: '0.3.0' });
   }
   if (req.method === 'GET' && url.pathname === '/api/system') {
     const rg = await run('rg', ['--version']);
@@ -60,18 +60,6 @@ async function request(req, res) {
     const input = await body(req);
     const target = safePath(input.path || '.');
     return json(res, 200, await rgSearch({ ...input, path: target }));
-  }
-  if (req.method === 'GET' && url.pathname === '/api/git/status') {
-    const input = url.searchParams.get('path') || '.';
-    return json(res, 200, await gitStatus(repoPath(input)));
-  }
-  if (req.method === 'GET' && url.pathname === '/api/git/log') {
-    const input = url.searchParams.get('path') || '.';
-    return json(res, 200, await gitLog(repoPath(input), url.searchParams.get('limit')));
-  }
-  if (req.method === 'GET' && url.pathname === '/api/git/diff') {
-    const input = url.searchParams.get('path') || '.';
-    return json(res, 200, await gitDiff(repoPath(input)));
   }
   if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
     const html = await readFile(path.join(WEB, 'index.html'));
